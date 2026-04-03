@@ -48,7 +48,7 @@ def generate_sql(question, schema):
 {schema}
 Question: {question}
 SQL:"""
-    response = openai.chat.completions.create(
+    response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": prompt}],
         max_tokens=300,
