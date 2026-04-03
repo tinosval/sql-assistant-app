@@ -1,4 +1,3 @@
-
 import streamlit as st
 import sqlite3
 import openai
@@ -20,13 +19,14 @@ with st.sidebar:
     st.markdown("---")
     st.header("📊 Database Info")
     
-    @st.cache_resource
     def get_connection():
-        return sqlite3.connect('sales_database.db')
+        """Create a new database connection for each request"""
+        return sqlite3.connect('sales_database.db', check_same_thread=False)
     
     conn = get_connection()
     sales_count = pd.read_sql_query("SELECT COUNT(*) as count FROM sales", conn)
     st.metric("Sales Records", sales_count['count'].iloc[0])
+    conn.close()
     
     st.markdown("---")
     st.header("📝 Sample Questions")
@@ -77,3 +77,5 @@ if st.button("🔍 Generate & Execute", type="primary"):
                 st.download_button("📥 Download CSV", csv, "results.csv")
             except Exception as e:
                 st.error(f"Error: {e}")
+            finally:
+                conn.close()
