@@ -44,16 +44,24 @@ def get_schema(conn):
     return schema
 
 def generate_sql(question, schema):
-    prompt = f"""Convert to SQLite SQL:
+    """Convert natural language to SQL using OpenAI 1.x API"""
+    prompt = f"""Convert this business question to SQLite SQL:
+
 {schema}
+
 Question: {question}
-SQL:"""
-    response = openai.ChatCompletion.create(
+
+Return ONLY the SQL query, no explanation. Use proper SQLite syntax."""
+    
+    # NEW OpenAI 1.x format
+    client = openai.OpenAI(api_key=openai.api_key)
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": prompt}],
         max_tokens=300,
         temperature=0.3
     )
+    
     sql = response.choices[0].message.content
     sql = sql.replace("```sql", "").replace("```", "").strip()
     return sql
